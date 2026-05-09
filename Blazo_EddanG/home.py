@@ -6,24 +6,18 @@ import cv2
 import os
 from datetime import datetime
 
-# -------------------------------
-# Load YOLOv8 model
-# -------------------------------
+
 @st.cache_resource
 def load_model():
     return YOLO("yolov8n.pt")
 
 model = load_model()
 
-# -------------------------------
-# Create folder for saved images
-# -------------------------------
+
 SAVE_FOLDER = "saved_frames"
 os.makedirs(SAVE_FOLDER, exist_ok=True)
 
-# -------------------------------
-# Streamlit UI
-# -------------------------------
+
 st.title("🎥 Live Object Detection & Tracking")
 st.write("Real-time AI object detection using YOLOv8")
 
@@ -44,16 +38,11 @@ alert_object = st.sidebar.selectbox(
     ["person", "cell phone", "bottle", "laptop", "chair"]
 )
 
-# -------------------------------
-# Video Processing Callback
-# -------------------------------
+
 def video_frame_callback(frame):
 
     img = frame.to_ndarray(format="bgr24")
 
-    # -------------------------------
-    # YOLO Detection
-    # -------------------------------
     results = model.predict(
         source=img,
         conf=confidence,
@@ -66,9 +55,7 @@ def video_frame_callback(frame):
     person_count = 0
     alert_detected = False
 
-    # -------------------------------
-    # Process Detection Results
-    # -------------------------------
+
     for result in results:
 
         boxes = result.boxes
@@ -119,9 +106,7 @@ def video_frame_callback(frame):
                     2
                 )
 
-    # -------------------------------
-    # Display Total Objects
-    # -------------------------------
+
     cv2.putText(
         annotated_frame,
         f"Total Objects: {total_objects}",
@@ -132,9 +117,8 @@ def video_frame_callback(frame):
         2
     )
 
-    # -------------------------------
-    # Display Person Count
-    # -------------------------------
+
+
     cv2.putText(
         annotated_frame,
         f"People Count: {person_count}",
@@ -145,9 +129,7 @@ def video_frame_callback(frame):
         2
     )
 
-    # -------------------------------
-    # Alert System
-    # -------------------------------
+
     if alert_detected:
 
         cv2.putText(
@@ -160,9 +142,7 @@ def video_frame_callback(frame):
             3
         )
 
-        # -------------------------------
-        # Save detected frame
-        # -------------------------------
+
         if save_images:
 
             timestamp = datetime.now().strftime(
@@ -181,9 +161,7 @@ def video_frame_callback(frame):
         format="bgr24"
     )
 
-# -------------------------------
-# Start Webcam Stream
-# -------------------------------
+
 webrtc_streamer(
     key="object-detection",
     video_frame_callback=video_frame_callback,
